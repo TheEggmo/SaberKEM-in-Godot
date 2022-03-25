@@ -9,8 +9,8 @@ class PublicKey:
 
 
 func _ready():
-	test()
-	return
+#	test()
+	
 	
 	# Initialize h1
 	var h1 = Polynomial.new(Params.n)
@@ -34,9 +34,15 @@ func _ready():
 		h.set_value(r, 0, h1)
 	Params.h = h
 	
+	# Initialize message for encryption/decryption
+	var m = Polynomial.new(Params.n)
+	m.read_array([0,1,0,1,0,0,1,1])
+	print(m)
 	
 	var KeyGen_result = Saber_PKE_KeyGen()
-	
+	var Enc_result = Saber_PKE_Enc(m, KeyGen_result[0])
+	var Dec_result = Saber_PKE_Dec(KeyGen_result[1], Enc_result)
+	print(Dec_result)
 
 #func Saber_PKE_KeyGen(seed_A, seed_sp) -> Array:
 func Saber_PKE_KeyGen() -> Array:
@@ -51,14 +57,16 @@ func Saber_PKE_KeyGen() -> Array:
 #		matrix_mult(
 #			matrix_transpose(A), s, Params.q), Params.h).mod_values(Params.q).shift_right(Params.eq - Params.ep))
 	var b :PolyMatrix = matrix_mult(matrix_transpose(A), s, Params.q)
-	b = matrix_add(b, Params.h).mod_values(Params.q)
-	b = b.shift_right(Params.eq - Params.ep)
+	b = matrix_add(b, Params.h)
+	b.mod_values(Params.q)
+	b.shift_right(Params.eq - Params.ep)
+	b.mod_values(Params.p)
 	
 	var pk = PublicKey.new(seed_A, b)
 	
 	return [pk, s]
 
-func Saber_PKE_Enc(m : Message, PublicKey_cpa : PublicKey):
+func Saber_PKE_Enc(m :Polynomial, PublicKey_cpa :PublicKey):
 	var seed_A = PublicKey_cpa.seed_A
 	var b = PublicKey_cpa.b
 	
@@ -68,12 +76,41 @@ func Saber_PKE_Enc(m : Message, PublicKey_cpa : PublicKey):
 	var sp :PolyMatrix = GenSecret(seed_sp)
 	
 	var bp :PolyMatrix = matrix_mult(A, sp, Params.q)
-	bp = matrix_add(bp, Params.h).mod_values(Params.q)
-	bp = bp.shift_right(Params.eq - Params.ep)
+	bp = matrix_add(bp, Params.h)
+	bp.mod_values(Params.q)
+	bp.shift_right(Params.eq - Params.ep)
+	bp.mod_values(Params.p)
 	
-	var vp = matrix_mult(matrix_transpose(b), sp.mod_values(Params.q))
+	sp.mod_values(Params.p)
+	var vp = matrix_mult(matrix_transpose(b), sp, Params.p)
+	vp = matrix_to_poly(vp)
 	
-	var cm
+	var cm :Polynomial = poly_add(vp, Params.h1)
+	m.shift_left(Params.ep - 1)
+	m.mod_coefficients(Params.p)
+	cm = poly_sub(cm, m)
+	cm.shift_right(Params.ep - Params.eT)
+	cm.mod_coefficients(Params.eT)
+	
+	return [cm, bp]
+
+func Saber_PKE_Dec(s :PolyMatrix, c :Array):
+	var cm :Polynomial = c[0]
+	var bp :PolyMatrix = c[1]
+	
+	s.mod_values(Params.p)
+	var v = matrix_mult(matrix_transpose(bp), s, Params.p)
+	v = matrix_to_poly(v)
+	v.mod_coefficients(Params.p)
+	
+	var mp :Polynomial = poly_add(v, Params.h2)
+	cm.shift_left(Params.ep - Params.eT)
+	mp = poly_sub(mp, cm)
+	mp.mod_coefficients(Params.p)
+	mp.shift_right(Params.ep-1)
+	mp.mod_coefficients(2)
+	
+	return mp
 
 func GenMatrix(seed_A) -> PolyMatrix:
 	var output_mat = PolyMatrix.new(Params.l, Params.l, Params.n)
@@ -104,15 +141,12 @@ func GenSecret(seed_sp) -> PolyMatrix:
 	output_vector.mod_values(Params.q)
 	return output_vector
 
-func InnerProd():
-	pass
-
-func matrix_transpose(original : PolyMatrix) -> PolyMatrix:
+func matrix_transpose(original :PolyMatrix) -> PolyMatrix:
 	var output = PolyMatrix.new(original.columns, original.rows, original.poly_degree)
 	
 	for r in original.rows:
 		for c in original.columns:
-			output.set_value(r, c, original.get_value(c, r))
+			output.set_value(c, r, original.get_value(r, c))
 	
 	return output
 
@@ -130,7 +164,7 @@ func matrix_mult(left :PolyMatrix, right :PolyMatrix, output_mod :int) -> PolyMa
 		for c in output.columns:
 			var sum = Polynomial.new(output.poly_degree)
 			for k in left.columns:
-				sum.add_polynomial(poly_mult(left.get_value(r, k), right.get_value(k, c), 8)) #TODO Remove the '8'
+				sum.add_polynomial(poly_mult(left.get_value(r, k), right.get_value(k, c)))
 			sum.mod_coefficients(output_mod)
 			output.set_value(r, c, sum)
 	
@@ -151,12 +185,6 @@ func matrix_add(left :PolyMatrix, right :PolyMatrix) -> PolyMatrix:
 #			# Calculate the output polynomial for this row and column
 			var left_side = left.get_value(r, c)
 			var right_side = right.get_value(r, c)
-#			var poly_sum = Polynomial.new(output.poly_degree)
-#
-#			for deg in output.poly_degree:
-#				var sum = left_side.get_coefficient(deg) + right_side.get_coefficient(deg)
-#				poly_sum.set_coefficient(deg, sum)
-#			output.set_value(r, c, poly_sum)
 			output.set_value(r, c, poly_add(left_side, right_side))
 	
 	return output
@@ -175,7 +203,7 @@ func poly_mult(left :Polynomial, right :Polynomial, target_degree := Params.n) -
 
 func poly_add(left :Polynomial, right :Polynomial) -> Polynomial:
 	if left.max_degree != right.max_degree:
-		print("add_polynomial(): Polynomials degree mismatch")
+		print("Error: poly_add(): Polynomials degree mismatch")
 		return null
 	
 	var output = Polynomial.new(left.max_degree)
@@ -184,6 +212,24 @@ func poly_add(left :Polynomial, right :Polynomial) -> Polynomial:
 		output.set_coefficient(deg, left.get_coefficient(deg) + right.get_coefficient(deg))
 	
 	return output
+
+func poly_sub(left :Polynomial, right :Polynomial) -> Polynomial:
+	if left.max_degree != right.max_degree:
+		print("Error: poly_sub(): Polynomials degree mismatch")
+		return null
+	
+	var output = Polynomial.new(left.max_degree)
+	
+	for deg in output.max_degree:
+		output.set_coefficient(deg, left.get_coefficient(deg) - right.get_coefficient(deg))
+	
+	return output
+
+func matrix_to_poly(input :PolyMatrix) -> Polynomial:
+	if input.columns != 1 || input.rows != 1:
+		print("Error: matrix_to_poly(): Can't convert")
+		return null
+	return input.get_value(0,0)
 
 func test():
 #	var poly = Polynomial.new(8)
@@ -230,3 +276,4 @@ func test():
 #	m1.print_values()
 #	m1.shift_right(2)
 #	m1.print_values()
+	return

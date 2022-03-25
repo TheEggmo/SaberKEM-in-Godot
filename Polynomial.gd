@@ -18,7 +18,13 @@ func _init(max_max_degree :int):
 	
 	coefficients.resize(max_degree)
 	for deg in range(max_degree):
-		coefficients[deg] = 0;
+		coefficients[deg] = 0
+
+# Set coefficients using an array
+func read_array(arr : Array):
+	arr.resize(max_degree)
+	for deg in range(max_degree):
+		coefficients[deg] = arr[deg] if arr[deg] != null else 0
 
 func set_coefficient(degree :int,  value :int):
 	coefficients[degree % max_degree] = value

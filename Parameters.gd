@@ -1,6 +1,6 @@
 extends Node
 
-const n = 256
+const n = 8
 
 const l = 3
 
