@@ -33,9 +33,6 @@ func mod_values(modulo :int):
 	for v in _values:
 		v.mod_coefficients(modulo)
 
-#func get_dimensions() -> Array:
-#	return [_rows, _columns, _poly_degree]
-
 func duplicate() -> PolyMatrix:
 	var dupe = get_script().new(rows, columns, poly_degree)
 	
@@ -54,9 +51,11 @@ func shift_right(amount : int):
 		v.shift_right(amount)
 
 func print_values():
-	print("Matrix")
-	for v in _values:
-		print(v)
+	print("Matrix, %s rows, %s columns:" % [rows, columns])
+	for row in rows:
+		for column in columns:
+			var address = row * self.columns + column
+			print("[%s,%s]: %s" % [row, column, _values[address]])
 
 func _get_rows():
 	return rows

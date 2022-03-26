@@ -18,10 +18,16 @@ _global_script_classes=[ {
 "class": "Polynomial",
 "language": "GDScript",
 "path": "res://Polynomial.gd"
+}, {
+"base": "Reference",
+"class": "Utils",
+"language": "GDScript",
+"path": "res://Utils.gd"
 } ]
 _global_script_class_icons={
 "PolyMatrix": "",
-"Polynomial": ""
+"Polynomial": "",
+"Utils": ""
 }
 
 [application]

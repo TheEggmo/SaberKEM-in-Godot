@@ -51,13 +51,9 @@ func Saber_PKE_KeyGen() -> Array:
 	
 	var A :PolyMatrix = GenMatrix(seed_A)
 	var s :PolyMatrix = GenSecret(seed_s)
-	# Transpozycja A, pomnożona przez s, plus h, modulo q, przesunięte w prawo o eq-ep
-#	var b :PolyMatrix = (
-#	matrix_add(
-#		matrix_mult(
-#			matrix_transpose(A), s, Params.q), Params.h).mod_values(Params.q).shift_right(Params.eq - Params.ep))
-	var b :PolyMatrix = matrix_mult(matrix_transpose(A), s, Params.q)
-	b = matrix_add(b, Params.h)
+	
+	var b :PolyMatrix = Utils.matrix_mult(Utils.matrix_transpose(A), s, Params.q)
+	b = Utils.matrix_add(b, Params.h)
 	b.mod_values(Params.q)
 	b.shift_right(Params.eq - Params.ep)
 	b.mod_values(Params.p)
@@ -75,20 +71,21 @@ func Saber_PKE_Enc(m :Polynomial, PublicKey_cpa :PublicKey):
 	var seed_sp = 69420 # HACK: Temporary hardcoded seed, change later
 	var sp :PolyMatrix = GenSecret(seed_sp)
 	
-	var bp :PolyMatrix = matrix_mult(A, sp, Params.q)
-	bp = matrix_add(bp, Params.h)
+	var bp :PolyMatrix = Utils.matrix_mult(A, sp, Params.q)
+	bp = Utils.matrix_add(bp, Params.h)
 	bp.mod_values(Params.q)
 	bp.shift_right(Params.eq - Params.ep)
 	bp.mod_values(Params.p)
 	
 	sp.mod_values(Params.p)
-	var vp = matrix_mult(matrix_transpose(b), sp, Params.p)
-	vp = matrix_to_poly(vp)
+	var vp = Utils.matrix_mult(Utils.matrix_transpose(b), sp, Params.p)
+	vp = Utils.matrix_to_poly(vp)
 	
-	var cm :Polynomial = poly_add(vp, Params.h1)
+	var cm :Polynomial = Utils.poly_add(vp, Params.h1)
 	m.shift_left(Params.ep - 1)
 	m.mod_coefficients(Params.p)
-	cm = poly_sub(cm, m)
+	cm = Utils.poly_sub(cm, m)
+	cm.mod_coefficients(Params.T)
 	cm.shift_right(Params.ep - Params.eT)
 	cm.mod_coefficients(Params.eT)
 	
@@ -99,13 +96,13 @@ func Saber_PKE_Dec(s :PolyMatrix, c :Array):
 	var bp :PolyMatrix = c[1]
 	
 	s.mod_values(Params.p)
-	var v = matrix_mult(matrix_transpose(bp), s, Params.p)
-	v = matrix_to_poly(v)
+	var v = Utils.matrix_mult(Utils.matrix_transpose(bp), s, Params.p)
+	v = Utils.matrix_to_poly(v)
 	v.mod_coefficients(Params.p)
 	
-	var mp :Polynomial = poly_add(v, Params.h2)
+	var mp :Polynomial = Utils.poly_add(v, Params.h2)
 	cm.shift_left(Params.ep - Params.eT)
-	mp = poly_sub(mp, cm)
+	mp = Utils.poly_sub(mp, cm)
 	mp.mod_coefficients(Params.p)
 	mp.shift_right(Params.ep-1)
 	mp.mod_coefficients(2)
@@ -114,7 +111,7 @@ func Saber_PKE_Dec(s :PolyMatrix, c :Array):
 
 func GenMatrix(seed_A) -> PolyMatrix:
 	var output_mat = PolyMatrix.new(Params.l, Params.l, Params.n)
-	rand_seed(seed_A)
+	seed(seed_A)
 	
 	for r in range(Params.l):
 		for c in range(Params.l):
@@ -129,107 +126,17 @@ func GenMatrix(seed_A) -> PolyMatrix:
 
 func GenSecret(seed_sp) -> PolyMatrix:
 	var output_vector = PolyMatrix.new(Params.l, 1, Params.n)
-	rand_seed(seed_sp)
+	seed(seed_sp)
 	
 	for r in range(Params.l):
 		var new_poly = Polynomial.new(Params.n)
 		for i in range(Params.n):
 			new_poly.set_coefficient(i, randi())
-		
+	
 		output_vector.set_value(r, 0, new_poly)
 	
 	output_vector.mod_values(Params.q)
 	return output_vector
-
-func matrix_transpose(original :PolyMatrix) -> PolyMatrix:
-	var output = PolyMatrix.new(original.columns, original.rows, original.poly_degree)
-	
-	for r in original.rows:
-		for c in original.columns:
-			output.set_value(c, r, original.get_value(r, c))
-	
-	return output
-
-func matrix_mult(left :PolyMatrix, right :PolyMatrix, output_mod :int) -> PolyMatrix:
-	if left.columns != right.rows:
-		print("Incorrect dimensions for matrix multiplication")
-		return null
-	if left.poly_degree != right.poly_degree:
-		print("Incorrect matrix polynomial degree")
-		return null
-	
-	var output = PolyMatrix.new(left.rows, right.columns, left.poly_degree)
-	
-	for r in output.rows:
-		for c in output.columns:
-			var sum = Polynomial.new(output.poly_degree)
-			for k in left.columns:
-				sum.add_polynomial(poly_mult(left.get_value(r, k), right.get_value(k, c)))
-			sum.mod_coefficients(output_mod)
-			output.set_value(r, c, sum)
-	
-	return output
-
-func matrix_add(left :PolyMatrix, right :PolyMatrix) -> PolyMatrix:
-	if left.columns != right.columns || left.rows != right.rows:
-		print("Incorrect dimensions for matrix addition")
-		return null
-	if left.poly_degree != right.poly_degree:
-		print("Incorrect matrix polynomial degree")
-		return null
-	
-#	var output :PolyMatrix = left.duplicate()
-	var output :PolyMatrix = PolyMatrix.new(left.rows, left.columns, left.poly_degree)
-	for r in output.rows:
-		for c in output.columns:
-#			# Calculate the output polynomial for this row and column
-			var left_side = left.get_value(r, c)
-			var right_side = right.get_value(r, c)
-			output.set_value(r, c, poly_add(left_side, right_side))
-	
-	return output
-
-func poly_mult(left :Polynomial, right :Polynomial, target_degree := Params.n) -> Polynomial:
-	if left.max_degree != right.max_degree:
-		print("Polynomial multiplication failed, degree mismatch")
-		return null
-	
-	var output = Polynomial.new(target_degree)
-	for l in left.max_degree:
-		for r in right.max_degree:
-			output.add_coefficient(l + r, left.get_coefficient(l) * right.get_coefficient(r))
-	
-	return output
-
-func poly_add(left :Polynomial, right :Polynomial) -> Polynomial:
-	if left.max_degree != right.max_degree:
-		print("Error: poly_add(): Polynomials degree mismatch")
-		return null
-	
-	var output = Polynomial.new(left.max_degree)
-	
-	for deg in output.max_degree:
-		output.set_coefficient(deg, left.get_coefficient(deg) + right.get_coefficient(deg))
-	
-	return output
-
-func poly_sub(left :Polynomial, right :Polynomial) -> Polynomial:
-	if left.max_degree != right.max_degree:
-		print("Error: poly_sub(): Polynomials degree mismatch")
-		return null
-	
-	var output = Polynomial.new(left.max_degree)
-	
-	for deg in output.max_degree:
-		output.set_coefficient(deg, left.get_coefficient(deg) - right.get_coefficient(deg))
-	
-	return output
-
-func matrix_to_poly(input :PolyMatrix) -> Polynomial:
-	if input.columns != 1 || input.rows != 1:
-		print("Error: matrix_to_poly(): Can't convert")
-		return null
-	return input.get_value(0,0)
 
 func test():
 #	var poly = Polynomial.new(8)
