@@ -1,5 +1,13 @@
 extends Node2D
 
+enum verbose{
+	None, # Only print error and warnings
+	Results, # Print all polynomials and matrices after they are calculated
+	Everything # Print every step of calculations
+}
+
+export(verbose) var verbose_level :int = 0
+
 class PublicKey:
 	func _init(new_seed, new_b):
 		seed_A = new_seed
@@ -34,35 +42,59 @@ func _ready():
 		h.set_value(r, 0, h1)
 	Params.h = h
 	
+	if verbose_level >= verbose.Results:
+		print("Params:")
+		print("h:")
+		Params.h.print_values()
+		print("h1: %s" % Params.h1)
+		print("h2: %s\n" % Params.h2)
+	
 	# Initialize message for encryption/decryption
 	var m = Polynomial.new(Params.n)
 	m.read_array([0,1,0,1,0,0,1,1])
-	print(m)
+	print("Input message: %s\n" % m)
 	
 	var KeyGen_result = Saber_PKE_KeyGen()
 	var Enc_result = Saber_PKE_Enc(m, KeyGen_result[0])
 	var Dec_result = Saber_PKE_Dec(KeyGen_result[1], Enc_result)
-	print(Dec_result)
+	
+	print("Decrypted message: %s\n" % Dec_result)
 
 #func Saber_PKE_KeyGen(seed_A, seed_sp) -> Array:
 func Saber_PKE_KeyGen() -> Array:
+	if verbose_level > verbose.None:
+		print("KeyGen:\n")
+	
 	var seed_A = 21372022 # HACK: Temporary hardcoded seed, change later
 	var seed_s = 42069 # HACK: Temporary hardcoded seed, change later
 	
 	var A :PolyMatrix = GenMatrix(seed_A)
 	var s :PolyMatrix = GenSecret(seed_s)
 	
+	if verbose_level >= verbose.Results:
+		print("KeyGen: A:")
+		A.print_values()
+		print("KeyGen: s:")
+		s.print_values()
+	
 	var b :PolyMatrix = Utils.matrix_mult(Utils.matrix_transpose(A), s, Params.q)
 	b = Utils.matrix_add(b, Params.h)
 	b.mod_values(Params.q)
 	b.shift_right(Params.eq - Params.ep)
-	b.mod_values(Params.p)
+	b.mod_values(Params.p) # Might be unnecessary
+	
+	if verbose_level >= verbose.Results:
+		print("KeyGen: b:")
+		b.print_values()
 	
 	var pk = PublicKey.new(seed_A, b)
 	
 	return [pk, s]
 
 func Saber_PKE_Enc(m :Polynomial, PublicKey_cpa :PublicKey):
+	if verbose_level > verbose.None:
+		print("Encryption:\n")
+	
 	var seed_A = PublicKey_cpa.seed_A
 	var b = PublicKey_cpa.b
 	
@@ -71,15 +103,26 @@ func Saber_PKE_Enc(m :Polynomial, PublicKey_cpa :PublicKey):
 	var seed_sp = 69420 # HACK: Temporary hardcoded seed, change later
 	var sp :PolyMatrix = GenSecret(seed_sp)
 	
+	if verbose_level >= verbose.Results:
+		print("Enc: A:")
+		A.print_values()
+		print("Enc: sp:")
+		sp.print_values()
+	
 	var bp :PolyMatrix = Utils.matrix_mult(A, sp, Params.q)
 	bp = Utils.matrix_add(bp, Params.h)
 	bp.mod_values(Params.q)
 	bp.shift_right(Params.eq - Params.ep)
-	bp.mod_values(Params.p)
+	bp.mod_values(Params.p) # Might be unnecessary
 	
 	sp.mod_values(Params.p)
 	var vp = Utils.matrix_mult(Utils.matrix_transpose(b), sp, Params.p)
 	vp = Utils.matrix_to_poly(vp)
+	
+	if verbose_level >= verbose.Results:
+		print("Enc: bp:")
+		bp.print_values()
+		print("Enc: vp: %s\n" % vp)
 	
 	var cm :Polynomial = Utils.poly_add(vp, Params.h1)
 	m.shift_left(Params.ep - 1)
@@ -87,11 +130,17 @@ func Saber_PKE_Enc(m :Polynomial, PublicKey_cpa :PublicKey):
 	cm = Utils.poly_sub(cm, m)
 	cm.mod_coefficients(Params.T)
 	cm.shift_right(Params.ep - Params.eT)
-	cm.mod_coefficients(Params.eT)
+	cm.mod_coefficients(Params.eT) # Might be unnecessary
+	
+	if verbose_level >= verbose.Results:
+		print("Enc: cm: %s\n" % cm)
 	
 	return [cm, bp]
 
 func Saber_PKE_Dec(s :PolyMatrix, c :Array):
+	if verbose_level > verbose.None:
+		print("Decryption:\n")
+	
 	var cm :Polynomial = c[0]
 	var bp :PolyMatrix = c[1]
 	
@@ -99,6 +148,9 @@ func Saber_PKE_Dec(s :PolyMatrix, c :Array):
 	var v = Utils.matrix_mult(Utils.matrix_transpose(bp), s, Params.p)
 	v = Utils.matrix_to_poly(v)
 	v.mod_coefficients(Params.p)
+	
+	if verbose_level >= verbose.Results:
+		print("Dec: v: %s\n" % v)
 	
 	var mp :Polynomial = Utils.poly_add(v, Params.h2)
 	cm.shift_left(Params.ep - Params.eT)

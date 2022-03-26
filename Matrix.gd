@@ -56,6 +56,7 @@ func print_values():
 		for column in columns:
 			var address = row * self.columns + column
 			print("[%s,%s]: %s" % [row, column, _values[address]])
+	print("")
 
 func _get_rows():
 	return rows
