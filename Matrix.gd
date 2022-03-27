@@ -33,15 +33,6 @@ func mod_values(modulo :int):
 	for v in _values:
 		v.mod_coefficients(modulo)
 
-func duplicate() -> PolyMatrix:
-	var dupe = get_script().new(rows, columns, poly_degree)
-	
-	for r in rows:
-		for c in columns:
-			dupe.set_value(r, c, self.get_value(r, c))
-	
-	return dupe
-
 func shift_left(amount : int):
 	for v in _values:
 		v.shift_left(amount)

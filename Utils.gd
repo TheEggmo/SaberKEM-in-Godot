@@ -93,3 +93,40 @@ static func matrix_to_poly(input :PolyMatrix) -> Polynomial:
 		print("Error: matrix_to_poly(): Can't convert")
 		return null
 	return input.get_value(0,0)
+
+static func random_poly(degree :int, mod :int) -> Polynomial:
+	var output := Polynomial.new(degree)
+	for d in degree:
+		output.set_coefficient(d, randi())
+	output.mod_coefficients(mod)
+	return output
+
+static func random_poly_negatives(degree :int, mod :int) -> Polynomial:
+	var output := Polynomial.new(degree)
+	for d in degree:
+		if randi() % 2 == 0:
+			output.set_coefficient(d, randi())
+		else:
+			output.set_coefficient(d, -1 * randi())
+#	output.mod_coefficients(mod)
+	return output
+
+static func random_matrix(rows :int, columns :int, degree :int, mod :int) -> PolyMatrix:
+	var output := PolyMatrix.new(rows, columns, degree)
+	for r in rows:
+		for c in columns:
+			output.set_value(r, c, random_poly(degree, mod))
+	return output
+
+static func duplicate_matrix(input :PolyMatrix) -> PolyMatrix:
+	var dupe = PolyMatrix.new(input.rows, input.columns, input.poly_degree)
+	for r in input.rows:
+		for c in input.columns:
+			dupe.set_value(r, c, duplicate_polynomial(input.get_value(r, c)))
+	return dupe
+
+static func duplicate_polynomial(input :Polynomial) -> Polynomial:
+	var dupe := Polynomial.new(input.max_degree)
+	for deg in input.max_degree:
+		dupe.set_coefficient(deg, input.get_coefficient(deg))
+	return dupe

@@ -12,6 +12,7 @@ var q = pow(2, eq)
 var p = pow(2, ep)
 var T = pow(2, eT)
 
+# eq > ep > eT
 #const eq = 13
 #const ep = 10
 #const eT = 4

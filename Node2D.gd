@@ -9,17 +9,13 @@ enum verbose{
 export(verbose) var verbose_level :int = 0
 
 class PublicKey:
+	var seed_A :int
+	var b :PolyMatrix
 	func _init(new_seed, new_b):
 		seed_A = new_seed
 		b = new_b
-	var seed_A 
-	var b
-
 
 func _ready():
-#	test()
-	
-	
 	# Initialize h1
 	var h1 = Polynomial.new(Params.n)
 	var h1_co = pow(2, Params.eq - Params.ep - 1)
@@ -44,6 +40,7 @@ func _ready():
 	
 	if verbose_level >= verbose.Results:
 		print("Params:")
+		print("eq: %s\nep: %s\neT: %s\n" % [Params.eq, Params.ep, Params.eT])
 		print("h:")
 		Params.h.print_values()
 		print("h1: %s" % Params.h1)
@@ -77,6 +74,7 @@ func Saber_PKE_KeyGen() -> Array:
 		print("KeyGen: s:")
 		s.print_values()
 	
+	# b = ((A^T * s + h) mod q) >> (eq - ep)
 	var b :PolyMatrix = Utils.matrix_mult(Utils.matrix_transpose(A), s, Params.q)
 	b = Utils.matrix_add(b, Params.h)
 	b.mod_values(Params.q)
@@ -109,12 +107,14 @@ func Saber_PKE_Enc(m :Polynomial, PublicKey_cpa :PublicKey):
 		print("Enc: sp:")
 		sp.print_values()
 	
+	# bp = ((A * sp + h) mod q) >> (eq - ep)
 	var bp :PolyMatrix = Utils.matrix_mult(A, sp, Params.q)
 	bp = Utils.matrix_add(bp, Params.h)
 	bp.mod_values(Params.q)
 	bp.shift_right(Params.eq - Params.ep)
 	bp.mod_values(Params.p) # Might be unnecessary
 	
+	# vp = b^T * (sp mod q)
 	sp.mod_values(Params.p)
 	var vp = Utils.matrix_mult(Utils.matrix_transpose(b), sp, Params.p)
 	vp = Utils.matrix_to_poly(vp)
@@ -124,6 +124,7 @@ func Saber_PKE_Enc(m :Polynomial, PublicKey_cpa :PublicKey):
 		bp.print_values()
 		print("Enc: vp: %s\n" % vp)
 	
+	# cm = (vp + h1 - (2^(ep - 1) * m mod p)) >> (ep - eT)
 	var cm :Polynomial = Utils.poly_add(vp, Params.h1)
 	m.shift_left(Params.ep - 1)
 	m.mod_coefficients(Params.p)
@@ -144,6 +145,7 @@ func Saber_PKE_Dec(s :PolyMatrix, c :Array):
 	var cm :Polynomial = c[0]
 	var bp :PolyMatrix = c[1]
 	
+	# v = bp^T * (s mod p)
 	s.mod_values(Params.p)
 	var v = Utils.matrix_mult(Utils.matrix_transpose(bp), s, Params.p)
 	v = Utils.matrix_to_poly(v)
@@ -152,6 +154,7 @@ func Saber_PKE_Dec(s :PolyMatrix, c :Array):
 	if verbose_level >= verbose.Results:
 		print("Dec: v: %s\n" % v)
 	
+	# mp = ((v - (2^(ep - eT) * cm) + h2) mod p) >> (ep - 1)
 	var mp :Polynomial = Utils.poly_add(v, Params.h2)
 	cm.shift_left(Params.ep - Params.eT)
 	mp = Utils.poly_sub(mp, cm)
@@ -189,50 +192,3 @@ func GenSecret(seed_sp) -> PolyMatrix:
 	
 	output_vector.mod_values(Params.q)
 	return output_vector
-
-func test():
-#	var poly = Polynomial.new(8)
-#	poly.set_coefficient(5, 10)
-#	poly.set_coefficient(2, 3)
-#	poly.mod_coefficients(8)
-	
-	var p1 = Polynomial.new(8)
-	var p2 = Polynomial.new(8)
-	var p3 = Polynomial.new(8)
-	var p4 = Polynomial.new(8)
-#
-	p1.set_coefficient(0, 3)
-	p1.set_coefficient(1, 5)
-	p1.set_coefficient(7, 4)
-	p2.set_coefficient(2, 3)
-	p2.set_coefficient(4, 10)
-##	p2.set_coefficient(6, 9)
-	p3.set_coefficient(2, 10)
-	p3.set_coefficient(4, 10)
-	p4.set_coefficient(2, 50)
-	p4.set_coefficient(3, 3)
-#
-	var m1 = PolyMatrix.new(2, 2, 8)
-#	var m2 = PolyMatrix.new(2, 2, 8)
-#
-	m1.set_value(0, 0, p1)
-	m1.set_value(0, 1, p2)
-	m1.set_value(1, 0, p3)
-	m1.set_value(1, 1, p4)
-#	m2.set_value(0, 0, p1)
-#	m2.set_value(0, 1, p2)
-#	m2.set_value(1, 0, p3)
-#	m2.set_value(1, 1, p4)
-#
-##	var poly_out = poly_mult(p1, p2, 8)
-##	poly_out.mod_coefficients(8)
-#	var mat_out = matrix_mult(m1, m2, 8)
-#	print(p1)
-#	p1.shift_right(1)
-#	print(p1)
-#	p1.shift_left(5)
-#	print(p1)
-#	m1.print_values()
-#	m1.shift_right(2)
-#	m1.print_values()
-	return

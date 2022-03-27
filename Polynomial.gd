@@ -40,9 +40,9 @@ func get_coefficient(degree :int):
 
 func mod_coefficients(modulo :int):
 	for deg in range(max_degree):
-		while coefficients[deg] < 0:
-			coefficients[deg] += modulo #HACK This is lazy and could be improved
 		coefficients[deg] = coefficients[deg] % modulo
+		while coefficients[deg] < 0:
+			coefficients[deg] += modulo
 
 func add_polynomial(other :Polynomial):
 	if max_degree != other.max_degree:
