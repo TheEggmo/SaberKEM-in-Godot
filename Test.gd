@@ -1,11 +1,38 @@
 extends Node2D
 
 func _ready():
-#	matrix_duplicate_test()
-	matrix_shift_test()
+	var p1 = Polynomial.new(Params.n)
+	p1.read_array([0,5,6,4,0,1,5,5])
+	var p2 = Polynomial.new(Params.n)
+	p2.read_array([7,6,2,6,6,5,6,6])
+	var p3 = Polynomial.new(Params.n)
+	p3.read_array([0,4,2,3,1,7,3,1])
+	var p4 = Polynomial.new(Params.n)
+	p4.read_array([1,6,5,0,6,6,4,1])
+	var m1 = PolyMatrix.new(2,1,8)
+	var m2 = PolyMatrix.new(2,1,8)
+	m1.set_value(0,0,p1)
+	m1.set_value(1,0,p2)
+	m2.set_value(0,0,p3)
+	m2.set_value(1,0,p4)
+	var s1 = Utils.poly_mult(p1, p3)
+	var s2 = Utils.poly_mult(p2, p4)
+	var out = Utils.poly_add(s1, s2)
+	out.mod_coefficients(Params.p)
+	print(out)
+
+#	matrix_modulo_test()
+
+func matrix_modulo_test():
+	print("Begin matrix modulo test")
+	var mat := Utils.random_matrix(2,2,8,16)
+	mat.print_values()
+	print("Modulate by 8:")
+	mat.mod_values(8)
+	mat.print_values()
 
 func matrix_duplicate_test():
-	print("begin matrix duplicate test")
+	print("Begin matrix duplicate test")
 	var mat := Utils.random_matrix(2,2,8,16)
 	var mat2 = Utils.duplicate_matrix(mat)
 	mat.print_values()

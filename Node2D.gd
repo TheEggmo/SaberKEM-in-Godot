@@ -1,12 +1,7 @@
 extends Node2D
 
-enum verbose{
-	None, # Only print error and warnings
-	Results, # Print all polynomials and matrices after they are calculated
-	Everything # Print every step of calculations
-}
-
-export(verbose) var verbose_level :int = 0
+export(int, 2) var verbose_level :int = 0
+export var ez_mode := false
 
 class PublicKey:
 	var seed_A :int
@@ -16,6 +11,8 @@ class PublicKey:
 		b = new_b
 
 func _ready():
+	Globals.set_verbose_level(verbose_level)
+	
 	# Initialize h1
 	var h1 = Polynomial.new(Params.n)
 	var h1_co = pow(2, Params.eq - Params.ep - 1)
@@ -38,7 +35,7 @@ func _ready():
 		h.set_value(r, 0, h1)
 	Params.h = h
 	
-	if verbose_level >= verbose.Results:
+	if Globals.check_verbose_level(Globals.verbose.Results):
 		print("Params:")
 		print("eq: %s\nep: %s\neT: %s\n" % [Params.eq, Params.ep, Params.eT])
 		print("h:")
@@ -48,7 +45,7 @@ func _ready():
 	
 	# Initialize message for encryption/decryption
 	var m = Polynomial.new(Params.n)
-	m.read_array([0,1,0,1,0,0,1,1])
+	m.read_array([0,1,1,1,0,0,1,1])
 	print("Input message: %s\n" % m)
 	
 	var KeyGen_result = Saber_PKE_KeyGen()
@@ -59,7 +56,7 @@ func _ready():
 
 #func Saber_PKE_KeyGen(seed_A, seed_sp) -> Array:
 func Saber_PKE_KeyGen() -> Array:
-	if verbose_level > verbose.None:
+	if Globals.check_verbose_level(Globals.verbose.Results):
 		print("KeyGen:\n")
 	
 	var seed_A = 21372022 # HACK: Temporary hardcoded seed, change later
@@ -68,7 +65,7 @@ func Saber_PKE_KeyGen() -> Array:
 	var A :PolyMatrix = GenMatrix(seed_A)
 	var s :PolyMatrix = GenSecret(seed_s)
 	
-	if verbose_level >= verbose.Results:
+	if Globals.check_verbose_level(Globals.verbose.Results):
 		print("KeyGen: A:")
 		A.print_values()
 		print("KeyGen: s:")
@@ -79,9 +76,8 @@ func Saber_PKE_KeyGen() -> Array:
 	b = Utils.matrix_add(b, Params.h)
 	b.mod_values(Params.q)
 	b.shift_right(Params.eq - Params.ep)
-	b.mod_values(Params.p) # Might be unnecessary
 	
-	if verbose_level >= verbose.Results:
+	if Globals.check_verbose_level(Globals.verbose.Results):
 		print("KeyGen: b:")
 		b.print_values()
 	
@@ -90,7 +86,7 @@ func Saber_PKE_KeyGen() -> Array:
 	return [pk, s]
 
 func Saber_PKE_Enc(m :Polynomial, PublicKey_cpa :PublicKey):
-	if verbose_level > verbose.None:
+	if Globals.check_verbose_level(Globals.verbose.Results):
 		print("Encryption:\n")
 	
 	var seed_A = PublicKey_cpa.seed_A
@@ -101,7 +97,7 @@ func Saber_PKE_Enc(m :Polynomial, PublicKey_cpa :PublicKey):
 	var seed_sp = 69420 # HACK: Temporary hardcoded seed, change later
 	var sp :PolyMatrix = GenSecret(seed_sp)
 	
-	if verbose_level >= verbose.Results:
+	if Globals.check_verbose_level(Globals.verbose.Results):
 		print("Enc: A:")
 		A.print_values()
 		print("Enc: sp:")
@@ -112,14 +108,14 @@ func Saber_PKE_Enc(m :Polynomial, PublicKey_cpa :PublicKey):
 	bp = Utils.matrix_add(bp, Params.h)
 	bp.mod_values(Params.q)
 	bp.shift_right(Params.eq - Params.ep)
-	bp.mod_values(Params.p) # Might be unnecessary
 	
-	# vp = b^T * (sp mod q)
+	# vp = b^T * (sp mod p)
 	sp.mod_values(Params.p)
+	sp.print_values()
 	var vp = Utils.matrix_mult(Utils.matrix_transpose(b), sp, Params.p)
 	vp = Utils.matrix_to_poly(vp)
 	
-	if verbose_level >= verbose.Results:
+	if Globals.check_verbose_level(Globals.verbose.Results):
 		print("Enc: bp:")
 		bp.print_values()
 		print("Enc: vp: %s\n" % vp)
@@ -127,19 +123,17 @@ func Saber_PKE_Enc(m :Polynomial, PublicKey_cpa :PublicKey):
 	# cm = (vp + h1 - (2^(ep - 1) * m mod p)) >> (ep - eT)
 	var cm :Polynomial = Utils.poly_add(vp, Params.h1)
 	m.shift_left(Params.ep - 1)
-	m.mod_coefficients(Params.p)
 	cm = Utils.poly_sub(cm, m)
-	cm.mod_coefficients(Params.T)
+	cm.mod_coefficients(Params.p)
 	cm.shift_right(Params.ep - Params.eT)
-	cm.mod_coefficients(Params.eT) # Might be unnecessary
 	
-	if verbose_level >= verbose.Results:
+	if Globals.check_verbose_level(Globals.verbose.Results):
 		print("Enc: cm: %s\n" % cm)
 	
 	return [cm, bp]
 
 func Saber_PKE_Dec(s :PolyMatrix, c :Array):
-	if verbose_level > verbose.None:
+	if Globals.check_verbose_level(Globals.verbose.Results):
 		print("Decryption:\n")
 	
 	var cm :Polynomial = c[0]
@@ -147,11 +141,13 @@ func Saber_PKE_Dec(s :PolyMatrix, c :Array):
 	
 	# v = bp^T * (s mod p)
 	s.mod_values(Params.p)
+	s.print_values()
+	bp.print_values()
 	var v = Utils.matrix_mult(Utils.matrix_transpose(bp), s, Params.p)
 	v = Utils.matrix_to_poly(v)
 	v.mod_coefficients(Params.p)
 	
-	if verbose_level >= verbose.Results:
+	if Globals.check_verbose_level(Globals.verbose.Results):
 		print("Dec: v: %s\n" % v)
 	
 	# mp = ((v - (2^(ep - eT) * cm) + h2) mod p) >> (ep - 1)
@@ -160,21 +156,24 @@ func Saber_PKE_Dec(s :PolyMatrix, c :Array):
 	mp = Utils.poly_sub(mp, cm)
 	mp.mod_coefficients(Params.p)
 	mp.shift_right(Params.ep-1)
-	mp.mod_coefficients(2)
 	
 	return mp
 
 func GenMatrix(seed_A) -> PolyMatrix:
 	var output_mat = PolyMatrix.new(Params.l, Params.l, Params.n)
 	seed(seed_A)
-	
-	for r in range(Params.l):
-		for c in range(Params.l):
-			var new_poly = Polynomial.new(Params.n)
-			for i in range(Params.n):
-				new_poly.set_coefficient(i, randi())
-			 
-			output_mat.set_value(r, c, new_poly)
+	if ez_mode:
+		for r in range(Params.l):
+			for c in range(Params.l):
+				output_mat.get_value(r,c).set_coefficient(randi(), randi())
+	else:
+		for r in range(Params.l):
+			for c in range(Params.l):
+				var new_poly = Polynomial.new(Params.n)
+				for i in range(Params.n):
+					new_poly.set_coefficient(i, randi())
+				 
+				output_mat.set_value(r, c, new_poly)
 	
 	output_mat.mod_values(Params.q)
 	return output_mat
@@ -182,13 +181,16 @@ func GenMatrix(seed_A) -> PolyMatrix:
 func GenSecret(seed_sp) -> PolyMatrix:
 	var output_vector = PolyMatrix.new(Params.l, 1, Params.n)
 	seed(seed_sp)
-	
-	for r in range(Params.l):
-		var new_poly = Polynomial.new(Params.n)
-		for i in range(Params.n):
-			new_poly.set_coefficient(i, randi())
-	
-		output_vector.set_value(r, 0, new_poly)
+	if ez_mode:
+		for r in range(Params.l):
+			output_vector.get_value(r,0).set_coefficient(randi(),randi())
+	else:
+		for r in range(Params.l):
+			var new_poly = Polynomial.new(Params.n)
+			for i in range(Params.n):
+				new_poly.set_coefficient(i, randi())
+			
+			output_vector.set_value(r, 0, new_poly)
 	
 	output_vector.mod_values(Params.q)
 	return output_vector
