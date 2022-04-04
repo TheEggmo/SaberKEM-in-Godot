@@ -12,4 +12,4 @@ func set_verbose_level(level :int):
 	_verbose_level = clamp(level, 0, 2)
 
 func check_verbose_level(level :int):
-	return level >= _verbose_level
+	return _verbose_level >= level

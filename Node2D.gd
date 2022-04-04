@@ -45,14 +45,18 @@ func _ready():
 	
 	# Initialize message for encryption/decryption
 	var m = Polynomial.new(Params.n)
-	m.read_array([0,1,1,1,0,0,1,1])
+	m.read_array([0,1,0,1,0,0,1,1])
+#	m.read_array([0,0,0,0,1,1,1,1])
 	print("Input message: %s\n" % m)
 	
 	var KeyGen_result = Saber_PKE_KeyGen()
-	var Enc_result = Saber_PKE_Enc(m, KeyGen_result[0])
+	var Enc_result = Saber_PKE_Enc(Utils.duplicate_polynomial(m), KeyGen_result[0])
 	var Dec_result = Saber_PKE_Dec(KeyGen_result[1], Enc_result)
 	
 	print("Decrypted message: %s\n" % Dec_result)
+	
+	var success = Utils.compare_polynomials(m, Dec_result)
+	print("Algorithm finished: %s" % ("success" if success else "failure"))
 
 #func Saber_PKE_KeyGen(seed_A, seed_sp) -> Array:
 func Saber_PKE_KeyGen() -> Array:
@@ -111,7 +115,7 @@ func Saber_PKE_Enc(m :Polynomial, PublicKey_cpa :PublicKey):
 	
 	# vp = b^T * (sp mod p)
 	sp.mod_values(Params.p)
-	sp.print_values()
+#	sp.print_values() # delete later
 	var vp = Utils.matrix_mult(Utils.matrix_transpose(b), sp, Params.p)
 	vp = Utils.matrix_to_poly(vp)
 	
@@ -141,8 +145,8 @@ func Saber_PKE_Dec(s :PolyMatrix, c :Array):
 	
 	# v = bp^T * (s mod p)
 	s.mod_values(Params.p)
-	s.print_values()
-	bp.print_values()
+#	s.print_values()
+#	bp.print_values()
 	var v = Utils.matrix_mult(Utils.matrix_transpose(bp), s, Params.p)
 	v = Utils.matrix_to_poly(v)
 	v.mod_coefficients(Params.p)

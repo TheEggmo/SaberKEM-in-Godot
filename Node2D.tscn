@@ -4,5 +4,4 @@
 
 [node name="Node2D" type="Node2D"]
 script = ExtResource( 1 )
-verbose_level = 1
 ez_mode = true

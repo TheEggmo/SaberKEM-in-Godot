@@ -130,3 +130,16 @@ static func duplicate_polynomial(input :Polynomial) -> Polynomial:
 	for deg in input.max_degree:
 		dupe.set_coefficient(deg, input.get_coefficient(deg))
 	return dupe
+
+static func compare_polynomials(left :Polynomial, right :Polynomial) -> bool:
+	if Globals.check_verbose_level(1): # Debugging mode
+		var out = true
+		for deg in left.max_degree:
+			if left.get_coefficient(deg) != right.get_coefficient(deg):
+				print("Warning: compare_polynomials: degree mismatch - %s" % deg)
+				out = false
+		return false
+	for deg in left.max_degree: # Normal mode
+		if left.get_coefficient(deg) != right.get_coefficient(deg):
+			return false
+	return true
