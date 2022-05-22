@@ -8,28 +8,6 @@ class PublicKey:
 		b = new_b
 
 func _ready():
-	# Initialize h1
-	var h1 = Polynomial.new(Params.n)
-	var h1_co = pow(2, Params.eq - Params.ep - 1)
-	for deg in h1.max_degree:
-		h1.set_coefficient(deg, h1_co)
-	Params.h1 = h1
-	
-	#Initialize h2
-	var h2 = Polynomial.new(Params.n)
-	var h2_co = (pow(2, Params.ep - 2)
-	- pow(2, Params.ep - Params.eT - 1)
-	+ pow(2, Params.eq - Params.ep - 1))
-	for deg in h2.max_degree:
-		h2.set_coefficient(deg, h2_co)
-	Params.h2 = h2
-	
-	# Initialize h
-	var h = PolyMatrix.new(Params.l, 1, Params.n)
-	for r in h.rows:
-		h.set_value(r, 0, h1)
-	Params.h = h
-	
 	# Initialize message for encryption/decryption
 	var bits : Array
 	for i in Params.n:
@@ -122,13 +100,16 @@ func GenMatrix(seed_A) -> PolyMatrix:
 	var output_mat = PolyMatrix.new(Params.l, Params.l, Params.n)
 	seed(seed_A)
 	
-	for r in range(Params.l):
-		for c in range(Params.l):
-			var new_poly = Polynomial.new(Params.n)
-			for i in range(Params.n):
-				new_poly.set_coefficient(i, randi())
-			 
-			output_mat.set_value(r, c, new_poly)
+	var buf = create_bytearray(Params.l * Params.l * Params.n * Params.eq / 8)
+	randomize_bitarray(buf)
+	var buf_array = split_bitarray(buf, Params.eq)
+	
+	var k = 0
+	for i1 in Params.l:
+		for i2 in Params.l:
+			for j in Params.n:
+				output_mat.get_value(i1, i2).set_coefficient(j, bitarray_to_int(buf_array[k]))
+				k += 1
 	
 	output_mat.mod_values(Params.q)
 	return output_mat
@@ -140,7 +121,7 @@ func GenSecret(seed_sp) -> PolyMatrix:
 	
 	var buf = create_bytearray(Params.l * Params.n * Params.mi / 8)
 	randomize_bitarray(buf)
-	var buf_array = split_bitarray(buf)
+	var buf_array = split_bitarray(buf, Params.mi / 2)
 	
 	var k = 0
 	for i in Params.l: # Dla każdego elementu wektora
@@ -153,9 +134,6 @@ func GenSecret(seed_sp) -> PolyMatrix:
 
 # Liczy ilość niezerowych elementów. Używać z tablicami liczb
 func HammingWeight(input : Array) -> int:
-	if input == null:
-		print("HammingWeight error")
-		return 0
 	return input.size() - input.count(0)
 
 # Losowo ustaw wszystkie zmienne w tablicy na 1 lub 0
@@ -171,7 +149,7 @@ func create_bytearray(length : int) -> Array:
 		out.append(0)
 	return out
 
-func split_bitarray(input : Array, padding := true) -> Array:
+func split_bitarray(input : Array, length :int, padding := true) -> Array:
 	var dup = input.duplicate(true)
 	var out : Array
 	var i = 0
@@ -181,4 +159,12 @@ func split_bitarray(input : Array, padding := true) -> Array:
 	while i < dup.size():
 		out.append(dup.slice(i, i+7))
 		i += 8
+	return out
+
+# Zamienia tablicę bitów na int
+# Zakłada się użycie tablicy pełnej zer i jedynek o długości 8, ale nie jest to sprawdzane
+func bitarray_to_int(input : Array) -> int:
+	var out = 0
+	for i in input.size():
+		out += input[i] * pow(2, i)
 	return out
