@@ -11,15 +11,6 @@ class PublicKey:
 		b = new_b
 
 func _ready():
-	var arr = create_bytearray(3)
-	arr.append(0)
-	print(arr)
-	randomize_bitarray(arr)
-	print(arr)
-	print(HammingWeight(arr))
-	print(split_bitarray(arr))
-	
-	return
 	Globals.set_verbose_level(verbose_level)
 	
 	# Initialize h1
@@ -53,8 +44,14 @@ func _ready():
 		print("h2: %s\n" % Params.h2)
 	
 	# Initialize message for encryption/decryption
+	var bits : Array
+	for i in Params.n:
+		bits.append(0)
+	randomize_bitarray(bits)
+#	m = randomize_bitarray(create_bytearray())
 	var m = Polynomial.new(Params.n)
-	m.read_array([0,1,0,1,0,0,1,1])
+	m.read_array(bits)
+#	m.read_array([0,1,0,1,0,0,1,1])
 #	m.read_array([0,0,0,0,1,1,1,1])
 	print("Input message: %s\n" % m)
 	
@@ -154,8 +151,6 @@ func Saber_PKE_Dec(s :PolyMatrix, c :Array):
 	
 	# v = bp^T * (s mod p)
 	s.mod_values(Params.p)
-#	s.print_values()
-#	bp.print_values()
 	var v = Utils.matrix_mult(Utils.matrix_transpose(bp), s, Params.p)
 	v = Utils.matrix_to_poly(v)
 	v.mod_coefficients(Params.p)
@@ -191,19 +186,20 @@ func GenMatrix(seed_A) -> PolyMatrix:
 	output_mat.mod_values(Params.q)
 	return output_mat
 
+# Generuje klucz prywatny za pomocą rozkładu dwumianowego
 func GenSecret(seed_sp) -> PolyMatrix:
 	var output_vector = PolyMatrix.new(Params.l, 1, Params.n)
 	seed(seed_sp)
-	if ez_mode:
-		for r in range(Params.l):
-			output_vector.get_value(r,0).set_coefficient(randi(),randi())
-	else:
-		for r in range(Params.l):
-			var new_poly = Polynomial.new(Params.n)
-			for i in range(Params.n):
-				new_poly.set_coefficient(i, randi())
-			
-			output_vector.set_value(r, 0, new_poly)
+	
+	var buf = create_bytearray(Params.l * Params.n * Params.mi / 8)
+	randomize_bitarray(buf)
+	var buf_array = split_bitarray(buf)
+	
+	var k = 0
+	for i in Params.l: # Dla każdego elementu wektora
+		for j in Params.mi: # Dla każdego współczynnika wielomianu
+			output_vector.get_value(i,0).set_coefficient(j,HammingWeight(buf_array[k]) - HammingWeight(buf_array[k+1]))
+			k += 2
 	
 	output_vector.mod_values(Params.q)
 	return output_vector
@@ -216,6 +212,7 @@ func HammingWeight(input : Array) -> int:
 	return input.size() - input.count(0)
 
 # Losowo ustaw wszystkie zmienne w tablicy na 1 lub 0
+# Zastępca SHAKE-128
 func randomize_bitarray(input : Array):
 	for i in input.size():
 		input[i] = randi() % 2
