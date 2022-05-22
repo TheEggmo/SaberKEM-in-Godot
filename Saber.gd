@@ -61,8 +61,9 @@ func _ready():
 	
 	print("Decrypted message: %s\n" % Dec_result)
 	
-	var success = Utils.compare_polynomials(m, Dec_result)
-	print("Algorithm finished: %s" % ("success" if success else "failure"))
+	var error_rate = Utils.compare_polynomials(m, Dec_result)
+	print("Algorithm finished!")
+	print("Error rate : %s" % (error_rate))
 
 #func Saber_PKE_KeyGen(seed_A, seed_sp) -> Array:
 func Saber_PKE_KeyGen() -> Array:
