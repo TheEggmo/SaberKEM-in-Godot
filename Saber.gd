@@ -8,6 +8,7 @@ class PublicKey:
 		b = new_b
 
 func _ready():
+	return
 #	randomize()
 	# Initialize message for encryption/decryption
 	var bits : Array

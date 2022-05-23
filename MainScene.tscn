@@ -1,8 +1,290 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Saber.gd" type="Script" id=1]
+[ext_resource path="res://Assets/Fonts/Arial.tres" type="DynamicFont" id=2]
+[ext_resource path="res://Assets/Fonts/ArialLarge.tres" type="DynamicFont" id=3]
+
+[sub_resource type="Theme" id=1]
 
 [node name="GUI" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = SubResource( 1 )
 
 [node name="Node" type="Node" parent="."]
 script = ExtResource( 1 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -512.0
+margin_top = -300.0
+margin_right = 512.0
+margin_bottom = 300.0
+alignment = 1
+
+[node name="KeyGen" type="VBoxContainer" parent="VBoxContainer"]
+margin_right = 1024.0
+margin_bottom = 197.0
+size_flags_vertical = 3
+alignment = 1
+
+[node name="TitleContainer" type="CenterContainer" parent="VBoxContainer/KeyGen"]
+margin_right = 1024.0
+margin_bottom = 35.0
+
+[node name="Label" type="Label" parent="VBoxContainer/KeyGen/TitleContainer"]
+margin_left = 395.0
+margin_right = 629.0
+margin_bottom = 35.0
+size_flags_horizontal = 0
+custom_fonts/font = ExtResource( 3 )
+text = "Generacja klucza"
+align = 1
+
+[node name="IOContainer" type="HBoxContainer" parent="VBoxContainer/KeyGen"]
+margin_top = 39.0
+margin_right = 1024.0
+margin_bottom = 163.0
+size_flags_vertical = 3
+alignment = 1
+
+[node name="InputContainer" type="VBoxContainer" parent="VBoxContainer/KeyGen/IOContainer"]
+margin_right = 510.0
+margin_bottom = 124.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="VBoxContainer/KeyGen/IOContainer/InputContainer"]
+margin_right = 510.0
+margin_bottom = 24.0
+custom_fonts/font = ExtResource( 2 )
+text = "Klucz publiczny"
+align = 1
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="TextEdit" type="TextEdit" parent="VBoxContainer/KeyGen/IOContainer/InputContainer"]
+margin_top = 28.0
+margin_right = 510.0
+margin_bottom = 124.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+readonly = true
+wrap_enabled = true
+
+[node name="OutputContainer" type="VBoxContainer" parent="VBoxContainer/KeyGen/IOContainer"]
+margin_left = 514.0
+margin_right = 1024.0
+margin_bottom = 124.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="VBoxContainer/KeyGen/IOContainer/OutputContainer"]
+margin_right = 510.0
+margin_bottom = 24.0
+custom_fonts/font = ExtResource( 2 )
+text = "Klucz prywatny"
+align = 1
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="TextEdit" type="TextEdit" parent="VBoxContainer/KeyGen/IOContainer/OutputContainer"]
+margin_top = 28.0
+margin_right = 510.0
+margin_bottom = 124.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+readonly = true
+wrap_enabled = true
+
+[node name="ButtonContainer" type="CenterContainer" parent="VBoxContainer/KeyGen"]
+margin_top = 167.0
+margin_right = 1024.0
+margin_bottom = 197.0
+
+[node name="Button" type="Button" parent="VBoxContainer/KeyGen/ButtonContainer"]
+margin_left = 484.0
+margin_right = 539.0
+margin_bottom = 30.0
+size_flags_horizontal = 0
+custom_fonts/font = ExtResource( 2 )
+text = "Start"
+
+[node name="Encryption" type="VBoxContainer" parent="VBoxContainer"]
+margin_top = 201.0
+margin_right = 1024.0
+margin_bottom = 398.0
+size_flags_vertical = 3
+alignment = 1
+
+[node name="TitleContainer" type="CenterContainer" parent="VBoxContainer/Encryption"]
+margin_right = 1024.0
+margin_bottom = 35.0
+
+[node name="Label" type="Label" parent="VBoxContainer/Encryption/TitleContainer"]
+margin_left = 445.0
+margin_right = 578.0
+margin_bottom = 35.0
+size_flags_horizontal = 0
+custom_fonts/font = ExtResource( 3 )
+text = "Enkrypcja"
+align = 1
+
+[node name="IOContainer" type="HBoxContainer" parent="VBoxContainer/Encryption"]
+margin_top = 39.0
+margin_right = 1024.0
+margin_bottom = 163.0
+size_flags_vertical = 3
+alignment = 1
+
+[node name="InputContainer" type="VBoxContainer" parent="VBoxContainer/Encryption/IOContainer"]
+margin_right = 510.0
+margin_bottom = 124.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="VBoxContainer/Encryption/IOContainer/InputContainer"]
+margin_right = 510.0
+margin_bottom = 24.0
+custom_fonts/font = ExtResource( 2 )
+text = "Wejście"
+align = 1
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="TextEdit" type="TextEdit" parent="VBoxContainer/Encryption/IOContainer/InputContainer"]
+margin_top = 28.0
+margin_right = 510.0
+margin_bottom = 124.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+wrap_enabled = true
+
+[node name="OutputContainer" type="VBoxContainer" parent="VBoxContainer/Encryption/IOContainer"]
+margin_left = 514.0
+margin_right = 1024.0
+margin_bottom = 124.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="VBoxContainer/Encryption/IOContainer/OutputContainer"]
+margin_right = 510.0
+margin_bottom = 24.0
+custom_fonts/font = ExtResource( 2 )
+text = "Wyjście"
+align = 1
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="TextEdit" type="TextEdit" parent="VBoxContainer/Encryption/IOContainer/OutputContainer"]
+margin_top = 28.0
+margin_right = 510.0
+margin_bottom = 124.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+wrap_enabled = true
+
+[node name="ButtonContainer" type="CenterContainer" parent="VBoxContainer/Encryption"]
+margin_top = 167.0
+margin_right = 1024.0
+margin_bottom = 197.0
+
+[node name="Button" type="Button" parent="VBoxContainer/Encryption/ButtonContainer"]
+margin_left = 484.0
+margin_right = 539.0
+margin_bottom = 30.0
+size_flags_horizontal = 0
+custom_fonts/font = ExtResource( 2 )
+text = "Start"
+
+[node name="Decryption" type="VBoxContainer" parent="VBoxContainer"]
+margin_top = 402.0
+margin_right = 1024.0
+margin_bottom = 600.0
+size_flags_vertical = 3
+
+[node name="TitleContainer" type="CenterContainer" parent="VBoxContainer/Decryption"]
+margin_right = 1024.0
+margin_bottom = 35.0
+
+[node name="Label" type="Label" parent="VBoxContainer/Decryption/TitleContainer"]
+margin_left = 444.0
+margin_right = 579.0
+margin_bottom = 35.0
+custom_fonts/font = ExtResource( 3 )
+text = "Dekrypcja"
+align = 1
+
+[node name="IOContainer" type="HBoxContainer" parent="VBoxContainer/Decryption"]
+margin_top = 39.0
+margin_right = 1024.0
+margin_bottom = 164.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 1
+
+[node name="InputContainer" type="VBoxContainer" parent="VBoxContainer/Decryption/IOContainer"]
+margin_right = 510.0
+margin_bottom = 125.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="VBoxContainer/Decryption/IOContainer/InputContainer"]
+margin_right = 510.0
+margin_bottom = 24.0
+custom_fonts/font = ExtResource( 2 )
+text = "Wejście"
+align = 1
+
+[node name="TextEdit" type="TextEdit" parent="VBoxContainer/Decryption/IOContainer/InputContainer"]
+margin_top = 28.0
+margin_right = 510.0
+margin_bottom = 125.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+wrap_enabled = true
+
+[node name="OutputContainer" type="VBoxContainer" parent="VBoxContainer/Decryption/IOContainer"]
+margin_left = 514.0
+margin_right = 1024.0
+margin_bottom = 125.0
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="VBoxContainer/Decryption/IOContainer/OutputContainer"]
+margin_right = 510.0
+margin_bottom = 24.0
+custom_fonts/font = ExtResource( 2 )
+text = "Wyjście"
+align = 1
+__meta__ = {
+"_editor_description_": ""
+}
+
+[node name="TextEdit" type="TextEdit" parent="VBoxContainer/Decryption/IOContainer/OutputContainer"]
+margin_top = 28.0
+margin_right = 510.0
+margin_bottom = 125.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+wrap_enabled = true
+
+[node name="ButtonContainer" type="CenterContainer" parent="VBoxContainer/Decryption"]
+margin_top = 168.0
+margin_right = 1024.0
+margin_bottom = 198.0
+
+[node name="Button" type="Button" parent="VBoxContainer/Decryption/ButtonContainer"]
+margin_left = 484.0
+margin_right = 539.0
+margin_bottom = 30.0
+size_flags_horizontal = 0
+custom_fonts/font = ExtResource( 2 )
+text = "Start"
