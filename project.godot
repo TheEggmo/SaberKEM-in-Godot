@@ -10,30 +10,42 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Reference",
+"class": "BitUtils",
+"language": "GDScript",
+"path": "res://Utilities/BitUtils.gd"
+}, {
+"base": "Reference",
+"class": "MatrixUtils",
+"language": "GDScript",
+"path": "res://Utilities/MatrixUtils.gd"
+}, {
+"base": "Reference",
 "class": "PolyMatrix",
 "language": "GDScript",
 "path": "res://Matrix.gd"
 }, {
 "base": "Reference",
+"class": "PolyUtils",
+"language": "GDScript",
+"path": "res://Utilities/PolyUtils.gd"
+}, {
+"base": "Reference",
 "class": "Polynomial",
 "language": "GDScript",
 "path": "res://Polynomial.gd"
-}, {
-"base": "Reference",
-"class": "Utils",
-"language": "GDScript",
-"path": "res://Utils.gd"
 } ]
 _global_script_class_icons={
+"BitUtils": "",
+"MatrixUtils": "",
 "PolyMatrix": "",
-"Polynomial": "",
-"Utils": ""
+"PolyUtils": "",
+"Polynomial": ""
 }
 
 [application]
 
 config/name="licencjat"
-run/main_scene="res://Node2D.tscn"
+run/main_scene="res://MainScene.tscn"
 config/icon="res://icon.png"
 
 [autoload]
