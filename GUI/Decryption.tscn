@@ -1,0 +1,42 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Assets/Fonts/Arial.tres" type="DynamicFont" id=1]
+[ext_resource path="res://Assets/Fonts/ArialLarge.tres" type="DynamicFont" id=2]
+[ext_resource path="res://GUI/IOContainer.tscn" type="PackedScene" id=3]
+
+[node name="Decryption" type="VBoxContainer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+size_flags_vertical = 3
+
+[node name="TitleContainer" type="CenterContainer" parent="."]
+margin_right = 1024.0
+margin_bottom = 35.0
+
+[node name="Label" type="Label" parent="TitleContainer"]
+margin_left = 444.0
+margin_right = 579.0
+margin_bottom = 35.0
+custom_fonts/font = ExtResource( 2 )
+text = "Dekrypcja"
+align = 1
+
+[node name="IOContainer" parent="." instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_top = 39.0
+margin_right = 1024.0
+margin_bottom = 566.0
+
+[node name="ButtonContainer" type="CenterContainer" parent="."]
+margin_top = 570.0
+margin_right = 1024.0
+margin_bottom = 600.0
+
+[node name="Button" type="Button" parent="ButtonContainer"]
+margin_left = 484.0
+margin_right = 539.0
+margin_bottom = 30.0
+size_flags_horizontal = 0
+custom_fonts/font = ExtResource( 1 )
+text = "Start"
