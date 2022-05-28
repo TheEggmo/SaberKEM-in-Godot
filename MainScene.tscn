@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=2]
 
-[ext_resource path="res://Saber.gd" type="Script" id=1]
+[ext_resource path="res://MainScene.gd" type="Script" id=2]
 [ext_resource path="res://Assets/Fonts/ArialLarge.tres" type="DynamicFont" id=3]
 [ext_resource path="res://GUI/WindowContainer.gd" type="Script" id=6]
 
@@ -10,13 +10,12 @@
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme = SubResource( 1 )
-
-[node name="Node" type="Node" parent="."]
-script = ExtResource( 1 )
+script = ExtResource( 2 )
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
 anchor_right = 1.0
 anchor_bottom = 1.0
+mouse_filter = 2
 follow_focus = true
 scroll_horizontal_enabled = false
 
@@ -29,6 +28,7 @@ alignment = 1
 script = ExtResource( 6 )
 
 [node name="NewWindowMenu" type="HBoxContainer" parent="ScrollContainer/WindowContainer"]
+visible = false
 margin_top = 256.0
 margin_right = 1024.0
 margin_bottom = 344.0

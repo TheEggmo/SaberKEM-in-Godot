@@ -38,9 +38,10 @@ margin_right = 1024.0
 margin_bottom = 600.0
 
 [node name="Button" type="Button" parent="ButtonContainer"]
-margin_left = 484.0
-margin_right = 539.0
+margin_left = 407.0
+margin_right = 617.0
 margin_bottom = 30.0
-size_flags_horizontal = 0
 custom_fonts/font = ExtResource( 1 )
-text = "Start"
+text = "Wygeneruj nowy klucz"
+
+[connection signal="pressed" from="ButtonContainer/Button" to="." method="_on_Button_pressed"]

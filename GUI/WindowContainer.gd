@@ -10,6 +10,11 @@ var window_keygen = preload("res://GUI/KeyGen.tscn")
 var window_encryption = preload("res://GUI/Encryption.tscn")
 var window_decryption = preload("res://GUI/Decryption.tscn")
 
+func _ready():
+	new_window(0)
+	new_window(1)
+	new_window(2)
+
 func new_window(type : int):
 	var window
 	match type:
