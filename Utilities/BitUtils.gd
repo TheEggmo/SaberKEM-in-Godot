@@ -1,5 +1,5 @@
 class_name BitUtils
-extends Reference
+extends Object
 
 # Losowo ustaw wszystkie zmienne w tablicy na 1 lub 0
 # Zastępca SHAKE-128

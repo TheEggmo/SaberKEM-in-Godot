@@ -1,5 +1,5 @@
 class_name PolyUtils
-extends Reference
+extends Object
 
 static func poly_add(left :Polynomial, right :Polynomial) -> Polynomial:
 	if left.max_degree != right.max_degree:
@@ -73,11 +73,28 @@ static func compare_polynomials(left :Polynomial, right :Polynomial) -> float:
 
 # Zamienia wielomian na string liczb
 # Dla zachowania odpowiedniego formatu stringa mniejsze liczby mają dodane zera z przodu 
-static func convert_to_numstring(poly :Polynomial, num_length :int) -> String:
+static func poly_to_numstring(poly :Polynomial, num_length :int) -> String:
 	var out = ""
 	for c in poly.coefficients:
-		var s = str(c)
-		while s.length() < num_length:
-			s = "0" + s
-		out += s
+		out += str(c).pad_zeros(num_length)
+	return out
+
+# Zamienia string liczb na wielomian
+static func numstring_to_poly(string :String, num_length :int) -> Polynomial:
+#	# Podziel string na równe cześci o długości num_length
+	var numbers = Utils.split_string(string, num_length)
+#	var i = 0
+#	while i < string.length():
+#		var substring = ""
+#		for j in range(i, i + num_length - 1):
+#			substring += string[j]
+#		numbers.append(substring)
+#		i += num_length
+	
+	# Zamień tablice stringów na wielomian
+	var out = Polynomial.new(Params.n)
+#	for c in out.coefficients.size()-1: # FIX Ogarnąć to że za krótkie wiadomości crashują
+	for c in 4:
+		out.set_coefficient(c, numbers[c].to_int())
+	
 	return out

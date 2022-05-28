@@ -13,7 +13,7 @@ static func KeyGen(seed_A, seed_sp) -> KeyPair:
 	
 	return KeyPair.new(PublicKey.new(seed_A, b), SecretKey.new(s))
 
-func Encrypt(m :Polynomial, PublicKey_cpa :PublicKey):
+static func Encrypt(m :Polynomial, PublicKey_cpa :PublicKey) -> Array:
 	var seed_A = PublicKey_cpa.seed_A
 	var b = PublicKey_cpa.b
 	
@@ -43,7 +43,7 @@ func Encrypt(m :Polynomial, PublicKey_cpa :PublicKey):
 	
 	return [cm, bp]
 
-static func Decrypt(s :PolyMatrix, c :Array):
+static func Decrypt(s :PolyMatrix, c :Array) -> Polynomial:
 	var cm :Polynomial = c[0]
 	var bp :PolyMatrix = c[1]
 	

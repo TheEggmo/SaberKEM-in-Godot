@@ -1,5 +1,5 @@
 class_name MatrixUtils
-extends Reference
+extends Object
 
 # Utility functions for matrices and polynomials
 
@@ -81,5 +81,14 @@ static func vector_to_string(input :PolyMatrix, num_length :int) -> String:
 	
 	var out = ""
 	for r in vec.rows:
-		out += PolyUtils.convert_to_numstring(vec.get_value(r, 0), num_length)
+		out += PolyUtils.poly_to_numstring(vec.get_value(r, 0), num_length)
+	return out
+
+static func numstring_to_vector(input :String, num_length :int, row_count :int, poly_degree :int):
+	var numbers = Utils.split_string(input, num_length)
+	var out = PolyMatrix.new(row_count, 1, poly_degree)
+	var k = 0
+	for i in row_count:
+		out.get_value(i, 0).set_coefficient(k, numbers[k].to_int())
+		k += 1
 	return out

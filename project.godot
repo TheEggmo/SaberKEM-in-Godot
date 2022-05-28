@@ -9,7 +9,7 @@
 config_version=4
 
 _global_script_classes=[ {
-"base": "Reference",
+"base": "Object",
 "class": "BitUtils",
 "language": "GDScript",
 "path": "res://Utilities/BitUtils.gd"
@@ -24,7 +24,7 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://KeyPair.gd"
 }, {
-"base": "Reference",
+"base": "Object",
 "class": "MatrixUtils",
 "language": "GDScript",
 "path": "res://Utilities/MatrixUtils.gd"
@@ -34,7 +34,7 @@ _global_script_classes=[ {
 "language": "GDScript",
 "path": "res://Matrix.gd"
 }, {
-"base": "Reference",
+"base": "Object",
 "class": "PolyUtils",
 "language": "GDScript",
 "path": "res://Utilities/PolyUtils.gd"
@@ -58,6 +58,11 @@ _global_script_classes=[ {
 "class": "SecretKey",
 "language": "GDScript",
 "path": "res://SecretKey.gd"
+}, {
+"base": "Object",
+"class": "Utils",
+"language": "GDScript",
+"path": "res://Utilities/Utils.gd"
 } ]
 _global_script_class_icons={
 "BitUtils": "",
@@ -69,7 +74,8 @@ _global_script_class_icons={
 "Polynomial": "",
 "PublicKey": "",
 "SaberPKE": "",
-"SecretKey": ""
+"SecretKey": "",
+"Utils": ""
 }
 
 [application]

@@ -1,4 +1,4 @@
-extends VBoxContainer
+extends Node
 
 func _on_Button_pressed():
 	var seed_A = randi()
