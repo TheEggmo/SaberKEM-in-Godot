@@ -14,16 +14,16 @@ static func create_bytearray(length : int) -> Array:
 		out.append(0)
 	return out
 
-static func split_bitarray(input : Array, length :int, padding := true) -> Array:
+static func split_bitarray(input : Array, segment_length :int, padding := true) -> Array:
 	var dup = input.duplicate(true)
 	var out : Array
 	var i = 0
 	if padding:
-		while dup.size() % 8 != 0:
+		while dup.size() % segment_length != 0:
 			dup.append(0)
 	while i < dup.size():
-		out.append(dup.slice(i, i+7))
-		i += 8
+		out.append(dup.slice(i, i + segment_length - 1))
+		i += segment_length
 	return out
 
 # Zamienia tablicę bitów na int

@@ -70,3 +70,14 @@ static func compare_polynomials(left :Polynomial, right :Polynomial) -> float:
 		if left.get_coefficient(deg) != right.get_coefficient(deg):
 			fails += 1
 	return fails / left.max_degree
+
+# Zamienia wielomian na string liczb
+# Dla zachowania odpowiedniego formatu stringa mniejsze liczby mają dodane zera z przodu 
+static func convert_to_numstring(poly :Polynomial, num_length :int) -> String:
+	var out = ""
+	for c in poly.coefficients:
+		var s = str(c)
+		while s.length() < num_length:
+			s = "0" + s
+		out += s
+	return out

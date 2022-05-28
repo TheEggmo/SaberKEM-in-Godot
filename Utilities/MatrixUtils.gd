@@ -43,11 +43,9 @@ static func matrix_mult(left :PolyMatrix, right :PolyMatrix, output_mod :int) ->
 
 static func matrix_transpose(original :PolyMatrix) -> PolyMatrix:
 	var output = PolyMatrix.new(original.columns, original.rows, original.poly_degree)
-	
 	for r in original.rows:
 		for c in original.columns:
 			output.set_value(c, r, original.get_value(r, c))
-	
 	return output
 
 # Convert a 1x1 matrix to a polynomial
@@ -72,3 +70,16 @@ static func duplicate_matrix(input :PolyMatrix) -> PolyMatrix:
 			dupe.set_value(r, c, PolyUtils.duplicate_polynomial(input.get_value(r, c)))
 	return dupe
 
+static func vector_to_string(input :PolyMatrix, num_length :int) -> String:
+	if input.rows != 1 && input.columns != 1:
+		print("PolyMatrix.vector_to_string(): Matrix is not a vector")
+		return ""
+	
+	var vec = duplicate_matrix(input)
+	if vec.rows == 1:
+		vec = matrix_transpose(vec)
+	
+	var out = ""
+	for r in vec.rows:
+		out += PolyUtils.convert_to_numstring(vec.get_value(r, 0), num_length)
+	return out

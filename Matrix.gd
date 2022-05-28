@@ -15,6 +15,7 @@ func _init(max_rows :int, max_columns :int, max_poly_degree :int):
 	for i in range(rows * columns):
 		_values.append(Polynomial.new(poly_degree))
 
+# Rzędy i kolumny zaczynają się od 0
 func set_value(row :int, column :int, new_value :Polynomial):
 	var address = row * self.columns + column
 	if self.poly_degree == new_value.max_degree:
@@ -22,12 +23,10 @@ func set_value(row :int, column :int, new_value :Polynomial):
 	else:
 		print("Polynomial degree incompatible with matrix degree")
 
+# Rzędy i kolumny zaczynają się od 0
 func get_value(row :int, column:int) -> Polynomial:
 	var address = row * self.columns + column
 	return _values[address]
-
-func matrix_poly_mult(poly :Polynomial) -> Polynomial:
-	return null
 
 func mod_values(modulo :int):
 	for v in _values:
