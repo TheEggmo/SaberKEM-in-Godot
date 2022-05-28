@@ -1,4 +1,4 @@
-extends VBoxContainer
+extends BoxContainer
 
 enum WindowType {
 	KeyGen,
@@ -27,7 +27,8 @@ func new_window(type : int):
 		_: # Default
 			return
 	add_child(window)
-	move_child($NewWindowMenu,get_child_count())
+	add_child(HSeparator.new())
+	move_child($NewWindowMenu,get_child_count()-1)
 
 func _on_NewKeygenButton_pressed():
 	new_window(WindowType.KeyGen)

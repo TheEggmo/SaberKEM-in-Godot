@@ -25,12 +25,29 @@ custom_fonts/font = ExtResource( 2 )
 text = "Generacja klucza"
 align = 1
 
-[node name="IOContainer" parent="." instance=ExtResource( 3 )]
-anchor_right = 0.0
-anchor_bottom = 0.0
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
 margin_top = 39.0
 margin_right = 1024.0
 margin_bottom = 566.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="PublicKey" parent="HBoxContainer" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_right = 510.0
+margin_bottom = 527.0
+title = "Klucz publiczny"
+readonly = true
+
+[node name="SecretKey" parent="HBoxContainer" instance=ExtResource( 3 )]
+anchor_right = 0.0
+anchor_bottom = 0.0
+margin_left = 514.0
+margin_right = 1024.0
+margin_bottom = 527.0
+title = "Klucz prywatny"
+readonly = true
 
 [node name="ButtonContainer" type="CenterContainer" parent="."]
 margin_top = 570.0
