@@ -79,39 +79,40 @@ static func poly_to_numstring(poly :Polynomial, num_length :int) -> String:
 		out += str(c).pad_zeros(num_length)
 	return out
 
-# Zamienia string liczb na wielomian
-static func numstring_to_poly(string :String, num_length :int) -> Polynomial:
-#	# Podziel string na równe cześci o długości num_length
-	var numbers = Utils.split_string(string, num_length)
-#	var i = 0
-#	while i < string.length():
-#		var substring = ""
-#		for j in range(i, i + num_length - 1):
-#			substring += string[j]
-#		numbers.append(substring)
-#		i += num_length
-	
-	# Zamień tablice stringów na wielomian
-	var out = Polynomial.new(Params.n)
-#	for c in out.coefficients.size()-1: # FIX Ogarnąć to że za krótkie wiadomości crashują
-	for c in 4:
-		out.set_coefficient(c, numbers[c].to_int())
-	
-	return out
+## Zamienia string liczb na wielomian
+#static func numstring_to_poly(string :String, num_length :int) -> Polynomial:
+##	# Podziel string na równe cześci o długości num_length
+#	var numbers = Utils.split_string(string, num_length)
+##	var i = 0
+##	while i < string.length():
+##		var substring = ""
+##		for j in range(i, i + num_length - 1):
+##			substring += string[j]
+##		numbers.append(substring)
+##		i += num_length
+#
+#	# Zamień tablice stringów na wielomian
+#	var out = Polynomial.new(Params.n)
+##	for c in out.coefficients.size()-1: # FIX Ogarnąć to że za krótkie wiadomości crashują
+#	for c in 4:
+#		out.set_coefficient(c, numbers[c].to_int())
+#
+#	return out
 
-# Zamienia PoolByteArray na wielomian. 
-# Wyjściowy wielomian będzie miał bitowe współczynniki
-static func PoolByteArray_to_polynomial(bytes :PoolByteArray) -> Polynomial:
-	var bits :Array
-	for byte in bytes:
-		bits.append_array(Utils.utf8_character_to_BitArray(byte))
-	
-	var output = Polynomial.new(bytes.size() - 1)
-	
-	return output
+## Zamienia PoolByteArray na wielomian. 
+## Wyjściowy wielomian będzie miał bitowe współczynniki
+#static func PoolByteArray_to_polynomial(bytes :PoolByteArray) -> Polynomial:
+#	var bits :Array
+#	for byte in bytes:
+#		bits.append_array(Utils.utf8_character_to_BitArray(byte))
+#	var output = Polynomial.new(bytes.size() - 1)
+#	return output
 
-static func BitArray_to_Polynomial(input :Array) -> Polynomial:
+static func Array_to_Polynomial(input :Array) -> Polynomial:
 	var output = Polynomial.new(input.size())
 	for deg in input.size():
 		output.set_coefficient(deg, input[deg])
 	return output
+
+static func Polynomial_to_Array(input :Polynomial) -> Array:
+	return input.coefficients
