@@ -98,3 +98,20 @@ static func numstring_to_poly(string :String, num_length :int) -> Polynomial:
 		out.set_coefficient(c, numbers[c].to_int())
 	
 	return out
+
+# Zamienia PoolByteArray na wielomian. 
+# Wyjściowy wielomian będzie miał bitowe współczynniki
+static func PoolByteArray_to_polynomial(bytes :PoolByteArray) -> Polynomial:
+	var bits :Array
+	for byte in bytes:
+		bits.append_array(Utils.utf8_character_to_BitArray(byte))
+	
+	var output = Polynomial.new(bytes.size() - 1)
+	
+	return output
+
+static func BitArray_to_Polynomial(input :Array) -> Polynomial:
+	var output = Polynomial.new(input.size())
+	for deg in input.size():
+		output.set_coefficient(deg, input[deg])
+	return output
