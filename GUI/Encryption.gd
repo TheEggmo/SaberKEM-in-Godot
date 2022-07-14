@@ -1,6 +1,7 @@
 extends Node
 
 # Zamień string na tablicę wielomianów stopnia 255
+# TODO: Fix/delete this
 func String_to_PolynomialArray(input :String) -> Array:
 	# Zamień tekst na postać tablicy znaków UTF-8
 	var string_utf8 = input.to_utf8()
@@ -14,6 +15,7 @@ func String_to_PolynomialArray(input :String) -> Array:
 		poly_array.append(PolyUtils.Array_to_Polynomial(b))
 	return poly_array
 
+# TODO: Fix/delete this
 func PolynomialArray_to_String(input :Array) -> String:
 	# Zamień tablicę wielomianów na tablicę tablic bitów
 	var bits_poly_ready :Array
@@ -25,15 +27,41 @@ func PolynomialArray_to_String(input :Array) -> String:
 		bits.append_array(b)
 	# Zamień tablicę bitów na tablicę znaków UTF-8
 	var string_utf8 = Utils.BitArray_to_PoolByteArray(bits)
+	
 	# Zamień znaki UTF-8 na tekst
-	return String(string_utf8)
+	var output = string_utf8.get_string_from_utf8()	
+	return output
+	
+#	var output := ""
+#	for poly in input:
+#		output += PolyUtils.poly_to_numstring(poly, 256) + "\n"
+#	return String(output)
+	
 
 func run_encryption(input :String, key :PublicKey) -> String:
+	# Uzupełnij wiadomość zerami z tyłu
+	var pad_count = 256 - input.length() % 256
+	var input_padded = input
+	for i in pad_count:
+		input_padded += "0"
+	# Zamień input z postaci stringa na tablice wielomianów
+	var message :Array
+	for c in input_padded:
+		message.append(c.to_int())
+	var message_split = Utils.split_array(message, 256)
+	var poly_array :Array
+	for msg in message_split:
+		poly_array.append(PolyUtils.Array_to_Polynomial(msg))
+	
 	# Zaszyfruj wielomiany
 	var poly_array_encrypted :Array
-	for p in String_to_PolynomialArray(input):
-		poly_array_encrypted.append(SaberPKE.Encrypt(p, key))
-	return PolynomialArray_to_String(poly_array_encrypted) # TODO Ogarnąć łączenie wiadomości i tablicy bp w jedno jakoS
+	for poly in poly_array:
+		var enc_output = SaberPKE.Encrypt(poly, key)
+		poly_array_encrypted.append(enc_output[0]) # cm
+		poly_array_encrypted.append_array(MatrixUtils.vector_to_array(enc_output[1])) # bp
+	var temp_out = String(PolyUtils.Polynomial_to_Array(poly_array_encrypted[0]))
+#	return PolynomialArray_to_String([poly_array_encrypted[0]])
+	return temp_out
 
 func _on_Button_pressed():
 	var pk = $VBoxContainer/PublicKey.get_text().split("\n")

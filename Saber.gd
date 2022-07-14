@@ -1,6 +1,7 @@
 class_name SaberPKE
 extends Reference
 
+# Generates a public and secret key pair using the given seeds.
 static func KeyGen(seed_A, seed_sp) -> KeyPair:
 	var A :PolyMatrix = _GenMatrix(seed_A)
 	var s :PolyMatrix = _GenSecret(seed_sp)
@@ -13,6 +14,7 @@ static func KeyGen(seed_A, seed_sp) -> KeyPair:
 	
 	return KeyPair.new(PublicKey.new(seed_A, b), SecretKey.new(s))
 
+# Encrypts the given polynomial using the given public key
 static func Encrypt(m :Polynomial, PublicKey_cpa :PublicKey) -> Array:
 	var seed_A = PublicKey_cpa.seed_A
 	var b = PublicKey_cpa.b
@@ -43,6 +45,9 @@ static func Encrypt(m :Polynomial, PublicKey_cpa :PublicKey) -> Array:
 	
 	return [cm, bp]
 
+# Decrypts a polynomial using the given vector.
+# s is the secret key vector.
+# c hold the encryption output (encrypted message and accompanying vector of polynomials).
 static func Decrypt(s :PolyMatrix, c :Array) -> Polynomial:
 	var cm :Polynomial = c[0]
 	var bp :PolyMatrix = c[1]
@@ -62,6 +67,7 @@ static func Decrypt(s :PolyMatrix, c :Array) -> Polynomial:
 	
 	return mp
 
+# Generates the matrix used for encryption.
 static func _GenMatrix(seed_A) -> PolyMatrix:
 	var output_mat = PolyMatrix.new(Params.l, Params.l, Params.n)
 	seed(seed_A)
@@ -80,7 +86,7 @@ static func _GenMatrix(seed_A) -> PolyMatrix:
 	output_mat.mod_values(Params.q)
 	return output_mat
 
-# Generuje klucz prywatny za pomocą rozkładu dwumianowego
+# Generates the private key vector using binomial distribution.
 static func _GenSecret(seed_sp) -> PolyMatrix:
 	var output_vector = PolyMatrix.new(Params.l, 1, Params.n)
 	seed(seed_sp)
@@ -98,7 +104,7 @@ static func _GenSecret(seed_sp) -> PolyMatrix:
 	output_vector.mod_values(Params.q)
 	return output_vector
 
-# Liczy ilość niezerowych elementów. Używać z tablicami liczb
+# Returns the ammount of non-zero elements in the given array.
 static func _HammingWeight(input : Array) -> int:
 	return input.size() - input.count(0)
 

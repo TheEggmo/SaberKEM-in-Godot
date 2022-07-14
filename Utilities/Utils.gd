@@ -1,7 +1,7 @@
 class_name Utils
 extends Object
 
-# Podziel string na cześci o długości segment_length
+# Split a string into segments of length segment_length
 static func split_string(input :String, segment_length :int) -> Array:
 	var output :Array
 	var i = 0
@@ -14,20 +14,22 @@ static func split_string(input :String, segment_length :int) -> Array:
 	return output
 
 # Podziel tablicę na części o długości segment_length
+# Split an array into segments of legnth segment_length
+# TODO: Remove padding?
 static func split_array(input :Array, segment_length :int, padding := true) -> Array:
 	var output :Array
 	var i = 0
 	while i < input.size():
 		output.append(input.slice(i, i + segment_length - 1))
 		i += segment_length
-	if padding:
-		var back :Array = output.back()
-		if back.size() < segment_length:
-			var filler :Array
-			filler.resize(segment_length - back.size())
-			for j in filler.size():
-				filler[j] = 0
-			back.append_array(filler)
+#	if padding:
+#		var back :Array = output.back()
+#		if back.size() < segment_length:
+#			var filler :Array
+#			filler.resize(segment_length - back.size())
+#			for j in filler.size():
+#				filler[j] = 0
+#			back.append_array(filler)
 	return output
 
 # Zamienia literę w formacie utf-8 na tablicę bitów.
