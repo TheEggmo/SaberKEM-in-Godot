@@ -8,4 +8,4 @@ func _init(secret_key :PolyMatrix):
 	values = secret_key
 
 func _to_string():
-	return MatrixUtils.vector_to_string(values, str(Params.q).length())
+	return MatrixUtils.vector_to_string(values)

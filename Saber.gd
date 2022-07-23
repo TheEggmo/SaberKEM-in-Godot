@@ -32,7 +32,6 @@ static func Encrypt(m :Polynomial, PublicKey_cpa :PublicKey) -> Array:
 	
 	# vp = b^T * (sp mod p)
 	sp.mod_values(Params.p)
-#	sp.print_values() # delete later
 	var vp = MatrixUtils.matrix_mult(MatrixUtils.matrix_transpose(b), sp, Params.p)
 	vp = MatrixUtils.matrix_to_poly(vp)
 	

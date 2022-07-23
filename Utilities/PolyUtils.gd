@@ -82,11 +82,17 @@ static func compare_polynomials(left :Polynomial, right :Polynomial) -> float:
 	return fails / left.max_degree
 
 # Converts a polynomial to a string of numbers.
-# TODO: Delete/rework this
-static func poly_to_numstring(poly :Polynomial, num_length :int) -> String:
+static func Polynomial_to_String(poly :Polynomial) -> String:
 	var out = ""
 	for c in poly.coefficients:
-		out += str(c).pad_zeros(num_length)
+		out += str(c) + " "
+	return out.strip_edges()
+
+static func String_to_Polynomial(string :String) -> Polynomial:
+	var numbers = string.split(" ")
+	var out :Polynomial = Polynomial.new(numbers.size()) 
+	for i in numbers.size():
+		out.set_coefficient(i, numbers[i].to_int())
 	return out
 
 # Converts the given array to a polynomial.

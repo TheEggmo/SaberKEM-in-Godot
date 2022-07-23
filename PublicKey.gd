@@ -12,5 +12,5 @@ func _to_string():
 	var out = ""
 	out += str(seed_A)
 	out += "\n"
-	out += MatrixUtils.vector_to_string(b, str(Params.p).length())
+	out += MatrixUtils.vector_to_string(b)
 	return out

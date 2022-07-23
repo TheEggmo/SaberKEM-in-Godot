@@ -76,19 +76,18 @@ static func duplicate_matrix(input :PolyMatrix) -> PolyMatrix:
 	return dupe
 
 # Converts the given input vector to a string.
-static func vector_to_string(input :PolyMatrix, num_length :int) -> String:
+static func vector_to_string(input :PolyMatrix) -> String:
 	if input.rows != 1 && input.columns != 1:
-		print("PolyMatrix.vector_to_string(): Matrix is not a vector")
+		print("PolyMatrix.vector_to_string(): Input is not a vector")
 		return ""
-	
 	var vec = duplicate_matrix(input)
 	if vec.rows == 1:
 		vec = matrix_transpose(vec)
 	
 	var out = ""
 	for r in vec.rows:
-		out += PolyUtils.poly_to_numstring(vec.get_value(r, 0), num_length)
-	return out
+		out += PolyUtils.Polynomial_to_String(vec.get_value(r, 0)) + "\n"
+	return out.strip_edges()
 
 # Converts a string of numbers to a vector
 static func numstring_to_vector(input :String, num_length :int, row_count :int, poly_degree :int):
@@ -99,6 +98,13 @@ static func numstring_to_vector(input :String, num_length :int, row_count :int, 
 		out.get_value(i, 0).set_coefficient(k, numbers[k].to_int())
 		k += 1
 	return out
+
+# Converts an array of polynomials to a vector
+static func array_to_vector(input :Array) -> PolyMatrix:
+	var vector = PolyMatrix.new(input.size(), 1, input[0].max_degree)
+	for i in input.size():
+		vector.set_value(i, 0, input[i])
+	return vector
 
 # Converts a vector to an array of polynomials.
 static func vector_to_array(input :PolyMatrix) -> Array:
