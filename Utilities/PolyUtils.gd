@@ -94,16 +94,3 @@ static func String_to_Polynomial(string :String) -> Polynomial:
 	for i in numbers.size():
 		out.set_coefficient(i, numbers[i].to_int())
 	return out
-
-# Converts the given array to a polynomial.
-# The array must contain numbers.
-static func Array_to_Polynomial(input :Array) -> Polynomial:
-	var output = Polynomial.new(input.size())
-	for deg in input.size():
-		output.set_coefficient(deg, input[deg])
-	return output
-
-# Converts the given polynomial to an array
-static func Polynomial_to_Array(input :Polynomial) -> Array:
-	return input.coefficients
-

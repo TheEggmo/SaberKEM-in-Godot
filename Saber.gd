@@ -97,13 +97,8 @@ static func _GenSecret(seed_sp) -> PolyMatrix:
 	var k = 0
 	for i in Params.l: # Dla każdego elementu wektora(wielomianu)
 		for j in Params.n: # Dla każdego współczynnika wielomianu
-			output_vector.get_value(i,0).set_coefficient(j,_HammingWeight(buf_array[k]) - _HammingWeight(buf_array[k+1]))
+			output_vector.get_value(i,0).set_coefficient(j,Utils.HammingWeight(buf_array[k]) - Utils.HammingWeight(buf_array[k+1]))
 			k += 2
 	
 	output_vector.mod_values(Params.q)
 	return output_vector
-
-# Returns the ammount of non-zero elements in the given array.
-static func _HammingWeight(input : Array) -> int:
-	return input.size() - input.count(0)
-

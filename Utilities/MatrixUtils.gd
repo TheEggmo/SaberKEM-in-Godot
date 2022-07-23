@@ -58,14 +58,6 @@ static func matrix_to_poly(input :PolyMatrix) -> Polynomial:
 		return null
 	return input.get_value(0,0)
 
-# Generates a matrix with random values with the given paramters.
-static func random_matrix(rows :int, columns :int, degree :int, mod :int) -> PolyMatrix:
-	var output := PolyMatrix.new(rows, columns, degree)
-	for r in rows:
-		for c in columns:
-			output.set_value(r, c, PolyUtils.random_poly(degree, mod))
-	return output
-
 # Returns a copy of the given matrix.
 # Matrices are passed by reference, use this if you want to copy a matrix without modyfying the original.
 static func duplicate_matrix(input :PolyMatrix) -> PolyMatrix:
@@ -88,16 +80,6 @@ static func vector_to_string(input :PolyMatrix) -> String:
 	for r in vec.rows:
 		out += PolyUtils.Polynomial_to_String(vec.get_value(r, 0)) + "\n"
 	return out.strip_edges()
-
-# Converts a string of numbers to a vector
-static func numstring_to_vector(input :String, num_length :int, row_count :int, poly_degree :int):
-	var numbers = Utils.split_string(input, num_length)
-	var out = PolyMatrix.new(row_count, 1, poly_degree)
-	var k = 0
-	for i in row_count:
-		out.get_value(i, 0).set_coefficient(k, numbers[k].to_int())
-		k += 1
-	return out
 
 # Converts an array of polynomials to a vector
 static func array_to_vector(input :Array) -> PolyMatrix:
